@@ -60,7 +60,7 @@ pygame.display.update()
 # pygame.joystick er ein del av pygame core, og blir automatisk initialisert av pygame.init().
 # Når ein joystick er initialized vil den generere events som kjem i pygame si event-kø.
 # Den kan lage følgande events: JOYAXISMOTION JOYBALLMOTION JOYBUTTONDOWN JOYBUTTONUP JOYHATMOTION
-# Meir dokumentasjon: https://docs.python.org/3/tutorial/controlflow.html
+# Meir dokumentasjon: https://www.pygame.org/docs/ref/joystick.html#pygame.joystick.get_init
 
 num_joysticks = pygame.joystick.get_count()
 print(f'Fant {num_joysticks} joysticks')
