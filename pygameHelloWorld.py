@@ -2,6 +2,10 @@ import pygame, sys
 from pygame.locals import *
 from pygame.joystick import *
 
+import sys
+import time
+from pyaxidraw import axidraw
+
 # set up pygame
 pygame.init()
 
@@ -73,19 +77,34 @@ if (num_joysticks > 0):
     num_axes = my_joystick.get_numaxes()
 ####################################
 
+### AxiDraw setup
+ad = axidraw.AxiDraw() # Initialize class
+
+ad.interactive()            # Enter interactive mode
+ad_connected = ad.connect()    # Open serial port to AxiDraw 
+
+if not ad_connected:
+    sys.exit() # end script
+
+# ad.moveto(0,0)
+ad.goto(0,0) 
+
 # run the game loop
 while True:
     for event in pygame.event.get():
-        if event.type == pygame.JOYAXISMOTION:
-            print("Joystick axis motion.")
-            for i in range(num_axes):
-                print(f'Akse {i}: {my_joystick.get_axis(i)}')
         if event.type == pygame.JOYBUTTONDOWN:
             print("Joystick button pressed.")
         if event.type == pygame.JOYBUTTONUP:
             print("Joystick button released.")
-
         if event.type == QUIT:
+            ad.disconnect()
             pygame.quit()
-
             sys.exit()
+    # Lese av joystick
+    x = my_joystick.get_axis(0)
+    y = my_joystick.get_axis(1)
+    x = x if abs(x) > 0.15 else 0
+    y = y if abs(y) > 0.15 else 0
+    print(f'({x}, {y})')
+    ad.move(x, y)
+    time.sleep(1)
