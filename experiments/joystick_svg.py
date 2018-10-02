@@ -70,5 +70,4 @@ def main():
     start_game_loop(surface, joystick)
     
 if __name__ == '__main__':
-    print(f'Starter main...')
     main()
