@@ -21,13 +21,14 @@ POINTER_START_Y = 50
 # Global state
 pointer_x = POINTER_START_X
 pointer_y = POINTER_START_Y
+relative_line_segments = []
 
 def xy_filtered(x, y):
     radius = math.sqrt(x**2 + y**2)
     return (0, 0) if radius < 0.2 else (x, y)
 
 def start_game_loop(surface, joystick):
-    global pointer_x, pointer_y
+    global pointer_x, pointer_y, relative_line_segments
     pygame.display.update()
 
     lastJoystickPollTime = time.time()
@@ -38,7 +39,7 @@ def start_game_loop(surface, joystick):
                 print("Joystick button pressed.")
             if event.type == pygame.JOYBUTTONUP:
                 print("Joystick button released.")
-                path = svg.create_path(POINTER_START_X, POINTER_START_Y)
+                path = svg.create_path(POINTER_START_X, POINTER_START_Y, relative_line_segments)
                 svg.save_and_open_svg(path)
             if event.type == QUIT:
                 cleanup_and_exit()
@@ -56,7 +57,7 @@ def start_game_loop(surface, joystick):
             pygame.display.update()
             lastJoystickPollTime = time.time()
             if dx != 0 and dy != 0:
-                svg.add_line(dx, dy)
+                relative_line_segments.append((dx, dy))
 
 def main():
     surface = init_and_create_window()
