@@ -8,8 +8,8 @@ def create_path(start_x, start_y, relative_lines):
     relative_lines_string = ' '.join(relative_line_commands)
     full_path = f'M {start_x} {start_y} {relative_lines_string}'
     path = parse_path(full_path)
-    smoothened = smoothed_path(path)
-    return smoothened
+    # smoothened = smoothed_path(path)
+    return path
 
 def save_and_open_svg(path):
     disvg(path)
