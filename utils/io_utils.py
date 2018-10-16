@@ -19,6 +19,8 @@ def init_joystick():
     if (num_joysticks > 0):
         my_joystick = pygame.joystick.Joystick(0) # Vi skal bruke den "nullte" joysticken
         my_joystick.init()
+        num_buttons = my_joystick.get_numbuttons()
+        print(f'Fant {num_buttons} knapper')
     return my_joystick
 
 def cleanup_and_exit():

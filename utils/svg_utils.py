@@ -1,4 +1,4 @@
-from svgpathtools import parse_path, smoothed_path, disvg
+from svgpathtools import parse_path, smoothed_path, disvg, wsvg
 
 def line_tuple_to_command(line_tuple):
     return f'l {line_tuple[0]} {line_tuple[1]}'
@@ -10,6 +10,9 @@ def create_path(start_x, start_y, relative_lines):
     path = parse_path(full_path)
     # smoothened = smoothed_path(path)
     return path
+
+def save_svg(svg_paths, file_path):
+    wsvg(svg_paths, filename=file_path)
 
 def save_and_open_svg(path):
     disvg(path)
