@@ -15,9 +15,9 @@ from enum import Enum
 
 # TODO
 # - Teste at dette funkar som vi forventar
-# - Kor skal nye paths starte? Kan dei starte på 0, 0?
-# - Finne ut: Skal folk kunne tegne ansikt på avgrensa kvadrantar på eit ark
-# - Finne ut: Må dei som styrer standen bytte til eit clean ark når plotteren skal i tegn-sjølv-modus?
+# - Kor skal nye paths starte? Kan dei starte p 0, 0?
+# - Finne ut: Skal folk kunne tegne ansikt p avgrensa kvadrantar p eit ark
+# - Finne ut: M dei som styrer standen bytte til eit clean ark nr plotteren skal i tegn-sjlv-modus?
 
 class ProgramState(Enum):
     DRAW_EYES = 1
@@ -75,7 +75,7 @@ def start_game_loop(surface, joystick, plotter):
                 folder = DRAWING_PATH_DICT[program_state.name]
                 svg.save_svg([path], folder + "/" + fname + ".svg")
                 relative_line_segments = []
-                
+
                 if program_state == ProgramState.DRAW_EYES:
                     program_state = ProgramState.DRAW_NOSE
                 elif program_state == ProgramState.DRAW_NOSE:
@@ -86,7 +86,7 @@ def start_game_loop(surface, joystick, plotter):
                 plotter.moveto(0, 0)
                 plotter.disconnect()
                 cleanup_and_exit()
-        
+
         x_raw = joystick.get_axis(0)
         y_raw = joystick.get_axis(1)
         (x, y) = xy_filtered(x_raw, y_raw)
@@ -109,8 +109,8 @@ def main():
     plotter = init_plotter_interactive()
     if plotter == None:
         cleanup_and_exit()
-    
+
     start_game_loop(surface, joystick, plotter)
-    
+
 if __name__ == '__main__':
     main()
