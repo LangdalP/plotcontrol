@@ -41,6 +41,9 @@ PLOTTER_Y_MIN = 2.5
 PLOTTER_X_MAX = 26.5
 PLOTTER_Y_MAX = 18.5
 
+PLOTTER_X_MID = (PLOTTER_X_MAX - PLOTTER_X_MIN) / 2 + PLOTTER_X_MIN
+PLOTTER_Y_MID = (PLOTTER_Y_MAX - PLOTTER_Y_MIN) / 2 + PLOTTER_Y_MIN
+
 DRAW_FACTOR = 50
 
 # Global state
@@ -124,8 +127,7 @@ def reset(surface, plotter):
     paths = []
     if plotter:
         plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
-    plotter_x = PLOTTER_X_MIN
-    plotter_y = PLOTTER_Y_MIN
+
 
     if plotter:
         plotter.pendown()
@@ -142,16 +144,20 @@ def start_game_loop(surface, joystick, plotter):
     lastJoystickPollTime = time.time()
     plotter_x = PLOTTER_X_MIN
     plotter_y = PLOTTER_Y_MIN
-
+    pre_pen_down = False
 
     reset(surface, plotter)
 
     while True:
+        pen_down = False
         new_events = pygame.event.get()
         for event in new_events:
             if x_box_a_button_is_pressed(event):
+                pen_down = True
+            if pre_pen_down != pen_down:
                 toggle_pen_up_down()
-            if x_box_b_button_is_pressed(event):
+                pre_pen_down = pen_down
+            if x_box_y_button_is_pressed(event):
 
                 if plotter:
                     if pen_is_down:
@@ -174,6 +180,11 @@ def start_game_loop(surface, joystick, plotter):
 
                 if program_state == ProgramState.DRAW_EYES:
                     reset(surface, plotter)
+                    plotter_x = PLOTTER_X_MID
+                    plotter_y = PLOTTER_Y_MID
+
+                    if plotter:
+                        plotter.goto(plotter_x, plotter_y)
 
                     pygame.display.update()
             if event.type == QUIT:
