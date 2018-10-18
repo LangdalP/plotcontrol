@@ -24,6 +24,7 @@ class ProgramState(Enum):
     DRAW_EYES = 1
     DRAW_NOSE = 2
     DRAW_MOUTH = 3
+    PAUSE = 4
 
 # Constants
 DRAWING_PATH_DICT = {
@@ -35,10 +36,10 @@ DRAWING_PATH_DICT = {
 JOYSTICK_POLL_INTERVAL = 0.03 # Seconds
 JOYSTICK_SPEED_MULTIPLIER = 0.5
 
-PLOTTER_X_MIN = 1
-PLOTTER_Y_MIN = 1
-PLOTTER_X_MAX = 25
-PLOTTER_Y_MAX = 17
+PLOTTER_X_MIN = 2.5
+PLOTTER_Y_MIN = 2.5
+PLOTTER_X_MAX = 26.5
+PLOTTER_Y_MAX = 18.5
 
 DRAW_FACTOR = 50
 
@@ -63,10 +64,16 @@ def next_program_state():
     global program_state
     if program_state == ProgramState.DRAW_EYES:
         program_state = ProgramState.DRAW_NOSE
+        print("draw nose")
     elif program_state == ProgramState.DRAW_NOSE:
         program_state = ProgramState.DRAW_MOUTH
+        print("draw mouth")
     elif program_state == ProgramState.DRAW_MOUTH:
+        program_state = ProgramState.PAUSE
+        print("pause")
+    elif program_state == ProgramState.PAUSE:
         program_state = ProgramState.DRAW_EYES
+        print("draw eyes")
 
 def toggle_pen_up_down():
     global plotter, pen_is_down, relative_line_segments
@@ -102,10 +109,11 @@ def save_svg():
     global relative_line_segments, program_state, paths, fname
     svg_paths = svg.create_full_paths(paths)
 
-    folder = DRAWING_PATH_DICT[program_state.name]
-    svg.save_svg([svg_paths], folder + "/" + fname + ".svg")
-    relative_line_segments = []
-    paths = []
+    if svg_paths:
+        folder = DRAWING_PATH_DICT[program_state.name]
+        svg.save_svg([svg_paths], folder + "/" + fname + ".svg")
+        relative_line_segments = []
+        paths = []
 
 def reset(surface, plotter):
     global fname, plotter_x, plotter_y
@@ -119,6 +127,14 @@ def reset(surface, plotter):
     plotter_x = PLOTTER_X_MIN
     plotter_y = PLOTTER_Y_MIN
 
+    if plotter:
+        plotter.pendown()
+        plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MAX)
+        plotter.goto(PLOTTER_X_MAX, PLOTTER_Y_MAX)
+        plotter.goto(PLOTTER_X_MAX, PLOTTER_Y_MIN)
+        plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
+        plotter.penup()
+
 
 def start_game_loop(surface, joystick, plotter):
     global plotter_x, plotter_y, relative_line_segments, pen_is_down
@@ -128,8 +144,7 @@ def start_game_loop(surface, joystick, plotter):
     plotter_y = PLOTTER_Y_MIN
 
 
-    if plotter:
-        plotter.goto(plotter_x, plotter_y)
+    reset(surface, plotter)
 
     while True:
         new_events = pygame.event.get()
@@ -137,9 +152,26 @@ def start_game_loop(surface, joystick, plotter):
             if x_box_a_button_is_pressed(event):
                 toggle_pen_up_down()
             if x_box_b_button_is_pressed(event):
-                paths.append(relative_line_segments)
-                save_svg()
+
+                if plotter:
+                    if pen_is_down:
+                        plotter.penup()
+                    plotter.moveto(plotter_x+0.5, plotter_y)
+                    plotter.moveto(plotter_x, plotter_y)
+
+                    if pen_is_down:
+                        plotter.pendown()
+
+                if program_state != ProgramState.PAUSE:
+                    paths.append(relative_line_segments)
+                    save_svg()
                 next_program_state()
+
+                if program_state == ProgramState.PAUSE:
+                    if plotter:
+                        plotter.penup()
+                        plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
+
                 if program_state == ProgramState.DRAW_EYES:
                     reset(surface, plotter)
 
@@ -150,8 +182,8 @@ def start_game_loop(surface, joystick, plotter):
         currentTime = time.time()
         timeSinceLastPoll = currentTime - lastJoystickPollTime
         if timeSinceLastPoll > JOYSTICK_POLL_INTERVAL:
-            x_raw = joystick.get_axis(0)
-            y_raw = joystick.get_axis(1)
+            x_raw = -1 * joystick.get_axis(1)
+            y_raw = joystick.get_axis(0)
             (x, y) = xy_filtered(x_raw, y_raw)
             (dx, dy) = (JOYSTICK_SPEED_MULTIPLIER*x, JOYSTICK_SPEED_MULTIPLIER*y)
             if not (dx == 0 and dy == 0):

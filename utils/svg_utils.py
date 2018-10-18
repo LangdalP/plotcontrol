@@ -6,26 +6,27 @@ def line_tuple_to_command(line_tuple):
 def create_full_paths(paths):
     svg_paths = []
     for path in paths:
-        svg_paths.append(create_path(path))
-    try:
+        p = create_path(path)
+        if p:
+            svg_paths.append(p)
+    if len(svg_paths):
         relative_lines_string = ' '.join(svg_paths)
         path = parse_path(relative_lines_string)
         # smoothened = smoothed_path(path)
         return path
-    except Exception:
-        print("failed creating path")
-        return ""
+    return False
+
 
 def create_path(relative_lines):
 
-    try:
+    if len(relative_lines):
         relative_line_commands = map(line_tuple_to_command, relative_lines)
         relative_lines_string = ' '.join(relative_line_commands)
         (x,y) = relative_lines [0]
         return f'M {x} {y} {relative_lines_string} '
-    except Exception:
-        print("failed creating path")
         return ""
+    print("empty path")
+    return ""
 
 
 def save_svg(svg_paths, file_path):
