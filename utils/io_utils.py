@@ -6,7 +6,7 @@ from utils.colors import *
 
 def init_and_create_window():
     pygame.init()
-    windowSurface = pygame.display.set_mode((500, 400), 0, 32)
+    windowSurface = pygame.display.set_mode((1800, 1000), 0, 32)
     pygame.display.set_caption('Joystick SVG')
     windowSurface.fill(WHITE)
     return windowSurface
