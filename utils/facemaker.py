@@ -4,13 +4,14 @@ import uuid
 from svgpathtools import svg2paths, wsvg, disvg
 from svgpathtools.paths2svg import big_bounding_box
 
+
 def align_components(eyes, nose, mouth, height):
     nose_min, nose_max, _, _ = big_bounding_box(nose)
     eyes_min, eyes_max, _, _ = big_bounding_box(eyes)
-    mouth_min, mouth_max, _, _ = big_bounding_box(mouth)
+    _, mouth_max, _, _ = big_bounding_box(mouth)
 
     nose_height = nose_max - nose_min
-    nose_top = (height - nose_height) / 2
+    nose_top = (height + nose_height) / 2
     nose_delta = nose_top - nose_max
 
     eyes_height = eyes_max - eyes_min
@@ -24,7 +25,7 @@ def align_components(eyes, nose, mouth, height):
     list(map(lambda path: face.append(path.translated(complex(nose_delta, 0))), nose))
     list(map(lambda path: face.append(path.translated(complex(eyes_delta, 0))), eyes))
     list(map(lambda path: face.append(path.translated(complex(mouth_delta, 0))), mouth))
-    
+
     return face
 
 
@@ -36,11 +37,11 @@ def get_paths_from_directory(dirpath, feature_type):
 
 
 def generate_face():
-    height = 14.5
+    height = 30
     folder = './input'
 
     eyepaths = get_paths_from_directory(folder + '/eyes/', 'EYES')
-    nosepaths = get_paths_from_directory(folder +  '/nose/', 'NOSE')
+    nosepaths = get_paths_from_directory(folder + '/nose/', 'NOSE')
     mouthpaths = get_paths_from_directory(folder + '/mouth/', 'MOUTH')
 
     facepaths = align_components(eyepaths, nosepaths, mouthpaths, height)
@@ -49,6 +50,7 @@ def generate_face():
     wsvg(facepaths, filename=filename)
 
     return filename
+
 
 if __name__ == "__main__":
     generate_face()
