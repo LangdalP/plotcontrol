@@ -13,12 +13,15 @@ def init_plotter_interactive():
     return ad
 
 def disconnect_serial(plotter):
+    plotter.moveto(5, 5)
     plotter.disconnect()
 
 def start_svg_plot(plotter, plot_fname):
-    ad.plot_setup(plot_fname)
-    ad.plot_run()
+    plotter.plot_setup(plot_fname)
+    plotter.plot_run()
 
 def go_back_to_interactive_mode(plotter):
     plotter.interactive()
     plotter_connected = plotter.connect()
+    plotter.options.units = 1
+    plotter.update()
