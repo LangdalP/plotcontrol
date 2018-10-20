@@ -3,8 +3,8 @@ from pygame.locals import *
 from pygame.joystick import *
 from utils.io_utils import *
 from utils.colors import *
-from utils.gfx_utils import *
 from utils.plotter_utils import *
+import utils.gfx_utils as gfx
 import utils.svg_utils as svg
 
 import sys
@@ -33,7 +33,18 @@ DRAWING_PATH_DICT = {
     "DRAW_MOUTH": "drawings/mouth",
 }
 
-JOYSTICK_POLL_INTERVAL = 0.03 # Seconds
+INSTRUKSJON_DICT = {
+    "DRAW_EYES": "Trykk A når du vil tegne nesa",
+    "DRAW_NOSE": "Trykk A når du vil tegne munnen",
+    "DRAW_MOUTH": "Trykk A for å avslutte",
+    "PAUSE": "Trykk A når du vil tegne øynene",
+}
+
+XBOX_A_BTN = 0
+XBOX_B_BTN = 1
+XBOX_X_BTN = 2
+XBOX_BACK_BTN = 6
+
 JOYSTICK_SPEED_MULTIPLIER = 0.5
 
 PLOTTER_X_MIN = 2.5
@@ -44,7 +55,10 @@ PLOTTER_Y_MAX = 18.5
 PLOTTER_X_MID = (PLOTTER_X_MAX - PLOTTER_X_MIN) / 2 + PLOTTER_X_MIN
 PLOTTER_Y_MID = (PLOTTER_Y_MAX - PLOTTER_Y_MIN) / 2 + PLOTTER_Y_MIN
 
-DRAW_FACTOR = 50
+# Var 50
+DRAW_FACTOR = 20
+PREVIEW_OFFSET_X = 500
+PREVIEW_OFFSET_Y = 300
 
 # Global state
 plotter_x = PLOTTER_X_MIN
@@ -52,10 +66,14 @@ plotter_y = PLOTTER_Y_MIN
 paths = []
 relative_line_segments = []
 
-program_state = ProgramState.DRAW_EYES
+# GFX
+font_renderer = None
+window_width = None
+window_height = None
+
+program_state = ProgramState.PAUSE
 
 plotter = None
-pen_is_down = False
 
 fname = uuid.uuid4().hex
 
@@ -78,38 +96,24 @@ def next_program_state():
         program_state = ProgramState.DRAW_EYES
         print("draw eyes")
 
-def toggle_pen_up_down():
-    global plotter, pen_is_down, relative_line_segments
-    pen_is_down = not pen_is_down
-    if pen_is_down:
-        print("pendown")
-        relative_line_segments = []
-        if plotter:
-            plotter.pendown()
-    else:
-        print("penup")
-        paths.append(relative_line_segments)
-        relative_line_segments = []
-        if plotter:
-            plotter.penup()
+def reset_lines():
+    global relative_line_segments
+    relative_line_segments = []
 
-def x_box_a_button_is_pressed(event):
-     return event.type == pygame.JOYBUTTONDOWN and event.button == 0
-
-def x_box_b_button_is_pressed(event):
-  return event.type == pygame.JOYBUTTONDOWN and event.button == 1
-
-def x_box_y_button_is_pressed(event):
-    return event.type == pygame.JOYBUTTONDOWN and event.button == 2
+def save_lines():
+    global paths, relative_line_segments
+    paths.append(relative_line_segments)
+    relative_line_segments = []
 
 def quit():
+    print("Shutting down program")
     if plotter:
         plotter.moveto(0, 0)
         plotter.disconnect()
     cleanup_and_exit()
 
 def save_svg():
-    global relative_line_segments, program_state, paths, fname
+    global relative_line_segments, paths, fname
     svg_paths = svg.create_full_paths(paths)
 
     if svg_paths:
@@ -118,18 +122,9 @@ def save_svg():
         relative_line_segments = []
         paths = []
 
-def reset(surface, plotter):
-    global fname, plotter_x, plotter_y
-    print("reset")
-    fname = uuid.uuid4().hex
-    clear(surface)
-    relative_line_segments = []
-    paths = []
+def draw_border():
     if plotter:
         plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
-
-
-    if plotter:
         plotter.pendown()
         plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MAX)
         plotter.goto(PLOTTER_X_MAX, PLOTTER_Y_MAX)
@@ -137,40 +132,59 @@ def reset(surface, plotter):
         plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
         plotter.penup()
 
+def reset(surface, plotter):
+    global fname
+    print("Resetting game state")
+    fname = uuid.uuid4().hex
+    gfx.clear(surface)
+    relative_line_segments = []
+    paths = []
+    if plotter:
+        draw_border()
 
 def start_game_loop(surface, joystick, plotter):
-    global plotter_x, plotter_y, relative_line_segments, pen_is_down
+    global plotter_x, plotter_y, relative_line_segments
     pygame.display.update()
-    lastJoystickPollTime = time.time()
     plotter_x = PLOTTER_X_MIN
     plotter_y = PLOTTER_Y_MIN
-    pre_pen_down = False
-
     reset(surface, plotter)
 
+    pen_is_down = False
+
     while True:
-        pen_down = False
         new_events = pygame.event.get()
         for event in new_events:
-            if x_box_a_button_is_pressed(event):
-                pen_down = True
-            if pre_pen_down != pen_down:
-                toggle_pen_up_down()
-                pre_pen_down = pen_down
-            if x_box_y_button_is_pressed(event):
-
+            if event.type == pygame.JOYBUTTONDOWN and event.button == XBOX_A_BTN:
+                print("Pen down")
+                pen_is_down = True
                 if plotter:
+                    plotter.pendown()
+                if program_state != ProgramState.PAUSE:
+                    reset_lines()
+            if event.type == pygame.JOYBUTTONUP and event.button == XBOX_A_BTN:
+                print("Pen up")
+                pen_is_down = False
+                if plotter:
+                    plotter.penup()
+                if program_state != ProgramState.PAUSE:
+                    save_lines()
+            # Gå til neste state
+            if event.type == pygame.JOYBUTTONUP and event.button == XBOX_X_BTN: # TODO: Sjekk at dette faktisk er X
+                if program_state != ProgramState.PAUSE:
+                    # Må simulere pen-up
                     if pen_is_down:
-                        plotter.penup()
+                        pen_is_down = False
+                        if plotter:
+                            plotter.penup()
+                        if program_state != ProgramState.PAUSE:
+                            save_lines()
+                    save_svg()
+                
+                if plotter:
+                    # Let plotter do a "nod"
                     plotter.moveto(plotter_x+0.5, plotter_y)
                     plotter.moveto(plotter_x, plotter_y)
 
-                    if pen_is_down:
-                        plotter.pendown()
-
-                if program_state != ProgramState.PAUSE:
-                    paths.append(relative_line_segments)
-                    save_svg()
                 next_program_state()
 
                 if program_state == ProgramState.PAUSE:
@@ -187,50 +201,55 @@ def start_game_loop(surface, joystick, plotter):
                         plotter.goto(plotter_x, plotter_y)
 
                     pygame.display.update()
+            if event.type == pygame.JOYBUTTONDOWN and event.button == XBOX_BACK_BTN:
+                quit()
             if event.type == QUIT:
                 quit()
 
-        currentTime = time.time()
-        timeSinceLastPoll = currentTime - lastJoystickPollTime
-        if timeSinceLastPoll > JOYSTICK_POLL_INTERVAL:
-            x_raw = -1 * joystick.get_axis(1)
-            y_raw = joystick.get_axis(0)
-            (x, y) = xy_filtered(x_raw, y_raw)
-            (dx, dy) = (JOYSTICK_SPEED_MULTIPLIER*x, JOYSTICK_SPEED_MULTIPLIER*y)
-            if not (dx == 0 and dy == 0):
-                # svg
+        x_raw = -1 * joystick.get_axis(1)
+        y_raw = joystick.get_axis(0)
+        (x, y) = xy_filtered(x_raw, y_raw)
+        (dx, dy) = (JOYSTICK_SPEED_MULTIPLIER*x, JOYSTICK_SPEED_MULTIPLIER*y)
+        if not (dx == 0 and dy == 0):
+            (old_plotter_x, old_plotter_y) = (plotter_x, plotter_y)
+            plotter_x = min(max(plotter_x + dx, PLOTTER_X_MIN), PLOTTER_X_MAX)
+            plotter_y = min(max(plotter_y + dy, PLOTTER_Y_MIN), PLOTTER_Y_MAX)
 
-                (old_plotter_x, old_plotter_y) = (plotter_x, plotter_y)
-                plotter_x = min(max(plotter_x + dx, PLOTTER_X_MIN), PLOTTER_X_MAX)
-                plotter_y = min(max(plotter_y + dy, PLOTTER_Y_MIN), PLOTTER_Y_MAX)
+            relative_line_segments.append((plotter_x, plotter_y))
 
+            if plotter:
+                plotter.goto(plotter_x, plotter_y)
+            
+            color = RED if pen_is_down else BLUE
+            gfx.draw_line(surface,
+            old_plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
+            old_plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
+            plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
+            plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
+            color)
+            print(f'Plotter: {plotter_x}, {plotter_y}')
 
-                (dx, dy) = (plotter_x - old_plotter_x, plotter_y - old_plotter_y)
-                if not (dx == 0 and dy == 0):
-                    relative_line_segments.append((plotter_x, plotter_y))
-
-
-                    if plotter:
-                        plotter.goto(plotter_x, plotter_y)
-                    color = RED if pen_is_down else BLUE
-                    draw_line(surface,
-                    old_plotter_x*DRAW_FACTOR,
-                    old_plotter_y*DRAW_FACTOR,
-                    plotter_x*DRAW_FACTOR,
-                    plotter_y*DRAW_FACTOR,
-                    color)
-                    pygame.display.update()
-                    print(f'Plot moveto: {plotter_x}, {plotter_y}')
-                    lastJoystickPollTime = time.time()
+        gfx.draw_border(surface,
+            PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
+            PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
+            (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
+            (PLOTTER_Y_MAX -PLOTTER_X_MIN) * DRAW_FACTOR)
+        instruksjon = INSTRUKSJON_DICT[program_state.name]
+        text = font_renderer.render(instruksjon, False, (0, 0, 0))
+        gfx.render_text(surface, text)
+        pygame.display.update()
 
 
 def main():
-    global plotter, surface
+    global plotter, surface, font_renderer, window_width, window_height
     surface = init_and_create_window()
-    draw_pointer(surface, plotter_x*DRAW_FACTOR, plotter_y*DRAW_FACTOR)
-    draw_border(surface,
-    PLOTTER_X_MIN * DRAW_FACTOR,
-    PLOTTER_Y_MIN * DRAW_FACTOR,
+    font_renderer = init_font_rendering()
+    window_width, window_height = surface.get_size()
+
+    gfx.draw_pointer(surface, plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X, plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y)
+    gfx.draw_border(surface,
+    PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
+    PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
     (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
     (PLOTTER_Y_MAX -PLOTTER_X_MIN) * DRAW_FACTOR)
 
@@ -245,10 +264,7 @@ def main():
         start_game_loop(surface, joystick, plotter)
     except Exception as e:
         print(e)
-        if plotter:
-            plotter.moveto(0, 0)
-            plotter.disconnect()
-        cleanup_and_exit()
+        quit()
 
 
 if __name__ == '__main__':

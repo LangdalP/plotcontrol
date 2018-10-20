@@ -6,10 +6,16 @@ from utils.colors import *
 
 def init_and_create_window():
     pygame.init()
-    windowSurface = pygame.display.set_mode((1800, 1000), 0, 32)
+    pygame.font.init()
+    windowSurface = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
     pygame.display.set_caption('Joystick SVG')
     windowSurface.fill(WHITE)
     return windowSurface
+
+def init_font_rendering():
+    pygame.font.init()
+    textfont = pygame.font.SysFont('Helvetica', 70)
+    return textfont
 
 def init_joystick():
     num_joysticks = pygame.joystick.get_count()
