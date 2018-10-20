@@ -11,3 +11,14 @@ def init_plotter_interactive():
     ad.update()
     print(f'Fant trolig plotter...')
     return ad
+
+def disconnect_serial(plotter):
+    plotter.disconnect()
+
+def start_svg_plot(plotter, plot_fname):
+    ad.plot_setup(plot_fname)
+    ad.plot_run()
+
+def go_back_to_interactive_mode(plotter):
+    plotter.interactive()
+    plotter_connected = plotter.connect()

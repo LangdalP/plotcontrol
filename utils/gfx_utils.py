@@ -20,7 +20,7 @@ def render_text(surface, text, centerY):
     textRect = text.get_rect()
     textRect.centerx = 960
     textRect.centery = centerY
-    
+
     # Draw text
     surface.blit(text, textRect)
 
