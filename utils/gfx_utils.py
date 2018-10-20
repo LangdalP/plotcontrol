@@ -12,14 +12,15 @@ def draw_border(surface, a,b,w,h):
     padding = 4
     pygame.draw.rect(surface, BLACK, (int(a - padding), int(b - padding), int(w + 2*padding), int(h + 2*padding)), 2)
 
-def render_text(surface, text):
+def draw_text_background(surface):
+    pygame.draw.rect(surface, WHITE, (0, 0, 1920, 280))
+
+def render_text(surface, text, centerY):
     # Lets assume 1920 x 1080
     textRect = text.get_rect()
     textRect.centerx = 960
-    textRect.centery = 120
-
-    # Draw background
-    pygame.draw.rect(surface, WHITE, (0, 0, 1920, 280))
+    textRect.centery = centerY
+    
     # Draw text
     surface.blit(text, textRect)
 

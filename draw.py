@@ -34,10 +34,14 @@ DRAWING_PATH_DICT = {
 }
 
 INSTRUKSJON_DICT = {
-    "DRAW_EYES": "Trykk A når du vil tegne nesa",
-    "DRAW_NOSE": "Trykk A når du vil tegne munnen",
-    "DRAW_MOUTH": "Trykk A for å avslutte",
-    "PAUSE": "Trykk A når du vil tegne øynene",
+    "DRAW_EYES_1": "Tegn øyne",
+    "DRAW_EYES_2": "Trykk X når du vil gå videre",
+    "DRAW_NOSE_1": "Tegn en nese",
+    "DRAW_NOSE_2": "Trykk X når du vil gå videre",
+    "DRAW_MOUTH_1": "Tegn en munn",
+    "DRAW_MOUTH_2": "Trykk X for å avslutte",
+    "PAUSE_1": "Fri modus",
+    "PAUSE_2": "Sett i blankt ark og trykk X for å tegne ansikt",
 }
 
 XBOX_A_BTN = 0
@@ -79,7 +83,7 @@ fname = uuid.uuid4().hex
 
 def xy_filtered(x, y):
     radius = math.sqrt(x**2 + y**2)
-    return (0, 0) if radius < 0.2 else (x, y)
+    return (0, 0) if radius < 0.3 else (x, y)
 
 def next_program_state():
     global program_state
@@ -234,9 +238,13 @@ def start_game_loop(surface, joystick, plotter):
             PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
             (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
             (PLOTTER_Y_MAX -PLOTTER_X_MIN) * DRAW_FACTOR)
-        instruksjon = INSTRUKSJON_DICT[program_state.name]
-        text = font_renderer.render(instruksjon, False, (0, 0, 0))
-        gfx.render_text(surface, text)
+        instruksjon1 = INSTRUKSJON_DICT[program_state.name + "_1"]
+        instruksjon2 = INSTRUKSJON_DICT[program_state.name + "_2"]
+        text1 = font_renderer.render(instruksjon1, False, (0, 0, 0))
+        text2 = font_renderer.render(instruksjon2, False, (0, 0, 0))
+        gfx.draw_text_background(surface)
+        gfx.render_text(surface, text1, 100)
+        gfx.render_text(surface, text2, 180)
         pygame.display.update()
 
 
