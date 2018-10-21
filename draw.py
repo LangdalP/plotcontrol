@@ -261,17 +261,20 @@ def start_game_loop(surface, joystick, plotter):
                     plotter.goto(plotter_x, plotter_y)
                 
                 color = RED if pen_is_down else BLUE
+                (x0, y0) = gfx.screen_coords(old_plotter_x, old_plotter_y, PLOTTER_X_MAX, DRAW_FACTOR)
+                (x1, y1) = gfx.screen_coords(plotter_x, plotter_y, PLOTTER_X_MAX, DRAW_FACTOR)
                 gfx.draw_line(surface,
-                old_plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
-                old_plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
-                plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
-                plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
+                x0 + PREVIEW_OFFSET_X,
+                y0 + PREVIEW_OFFSET_Y,
+                x1 + PREVIEW_OFFSET_X,
+                y1 + PREVIEW_OFFSET_Y,
                 color)
                 print(f'Plotter: {plotter_x}, {plotter_y}')
 
+            (border_x0, border_y0) = gfx.screen_coords(PLOTTER_X_MIN, PLOTTER_Y_MIN, PLOTTER_X_MAX, DRAW_FACTOR)
             gfx.draw_border(surface,
-                PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
-                PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
+                border_x0 + PREVIEW_OFFSET_X,
+                border_y0 + PREVIEW_OFFSET_Y,
                 (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
                 (PLOTTER_Y_MAX -PLOTTER_X_MIN) * DRAW_FACTOR)
             instruksjon1 = INSTRUKSJON_DICT[program_state.name + "_1"]

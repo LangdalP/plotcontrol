@@ -26,3 +26,10 @@ def render_text(surface, text, centerY):
 
 def clear(surface):
     surface.fill(WHITE)
+
+# Helpers function for going from plotter coords to screen coords
+def screen_coords(plotter_x, plotter_y, plotter_x_max, scaling):
+    x = plotter_y * scaling
+    y = (plotter_x_max - plotter_x) * scaling
+    return (x, y)
+
