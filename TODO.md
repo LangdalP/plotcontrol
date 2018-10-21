@@ -5,14 +5,12 @@
 - [x] vis instruksjoner på skjermen
 - [x] Fiks: Det blir lagt til en strek når en skifter mode
 - [x] Fiks at genererte SVG-er blir riktig plottet
-- [ ] roter tegningen på skjerm?
+- [x] roter tegningen på skjerm?
 - [ ] Oppdater plotter_x og y når man går fra "tegn munn"-mode til "fri modus"
 - [ ] Fiks et mellomstopp på ca (2, 2) før (0, 0) når man går til generative mode
-- [ ] roter tegningen på skjerm?
 
 Hvis vi får tid:
 - [ ] Gjør det mulig å resette/slette SVG dersom man har tegnet alt som øyne (glemte å trykke for nese og munn)
 - [ x ] øk speed ved tegning av ramme
 - [ x ] øk speed ved pen up? for å gjevne ut feelingen
-
 - [ ] tegn prikker fremfor linjer med pen up?
