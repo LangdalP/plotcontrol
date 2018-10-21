@@ -130,7 +130,6 @@ speed_pen_down = 10
 speed_pen_up = 90
 
 def draw_border():
-    global spd
     if plotter:
         plotter.options.speed_pendown = 90
         plotter.update()
