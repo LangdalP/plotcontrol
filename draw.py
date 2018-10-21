@@ -60,8 +60,8 @@ PLOTTER_Y_MID = (PLOTTER_Y_MAX - PLOTTER_Y_MIN) / 2 + PLOTTER_Y_MIN
 
 # Var 50
 DRAW_FACTOR = 20
-PREVIEW_OFFSET_X = 500
-PREVIEW_OFFSET_Y = 300
+PREVIEW_OFFSET_X = 730
+PREVIEW_OFFSET_Y = 350
 
 # Global state
 plotter_x = PLOTTER_X_MIN
@@ -126,8 +126,13 @@ def save_svg():
         relative_line_segments = []
         paths = []
 
+speed_pen_down = 10
+speed_pen_up = 90
+
 def draw_border():
     if plotter:
+        plotter.options.speed_pendown = 90
+        plotter.update()
         plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
         plotter.pendown()
         plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MAX)
@@ -135,6 +140,8 @@ def draw_border():
         plotter.goto(PLOTTER_X_MAX, PLOTTER_Y_MIN)
         plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
         plotter.penup()
+        plotter.options.speed_pendown = speed_pen_down
+        plotter.update()
 
 def reset(surface, plotter, should_draw_border=True):
     global fname
@@ -151,7 +158,8 @@ def start_game_loop(surface, joystick, plotter):
     pygame.display.update()
     plotter_x = PLOTTER_X_MIN
     plotter_y = PLOTTER_Y_MIN
-    plotter.moveto(plotter_x, plotter_y)
+    if plotter:
+        plotter.moveto(plotter_x, plotter_y)
     reset(surface, plotter, False)
 
     pen_is_down = False
@@ -204,7 +212,7 @@ def start_game_loop(surface, joystick, plotter):
                         if program_state != ProgramState.PAUSE:
                             save_lines()
                     save_svg()
-                
+
                 if plotter:
                     # Let plotter do a "nod"
                     plotter.moveto(plotter_x+0.5, plotter_y)
@@ -252,21 +260,22 @@ def start_game_loop(surface, joystick, plotter):
 
                 if plotter:
                     plotter.goto(plotter_x, plotter_y)
-                
+
                 color = RED if pen_is_down else BLUE
                 gfx.draw_line(surface,
-                old_plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
-                old_plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
-                plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
-                plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
+                old_plotter_y*DRAW_FACTOR + 730,
+                -1*old_plotter_x*DRAW_FACTOR + 970,
+                plotter_y*DRAW_FACTOR + 730,
+                -1*plotter_x*DRAW_FACTOR + 970,
                 color)
                 print(f'Plotter: {plotter_x}, {plotter_y}')
 
             gfx.draw_border(surface,
                 PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
                 PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
-                (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
-                (PLOTTER_Y_MAX -PLOTTER_X_MIN) * DRAW_FACTOR)
+                (PLOTTER_Y_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
+                (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR)
+
             instruksjon1 = INSTRUKSJON_DICT[program_state.name + "_1"]
             instruksjon2 = INSTRUKSJON_DICT[program_state.name + "_2"]
             text1 = font_renderer.render(instruksjon1, False, (0, 0, 0))
@@ -283,7 +292,6 @@ def main():
     font_renderer = init_font_rendering()
     window_width, window_height = surface.get_size()
 
-    gfx.draw_pointer(surface, plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X, plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y)
     gfx.draw_border(surface,
     PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
     PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
@@ -294,7 +302,7 @@ def main():
     if joystick == None:
         cleanup_and_exit()
 
-    plotter = init_plotter_interactive()
+    plotter = init_plotter_interactive(speed_pen_down, speed_pen_up)
 
 
     try:

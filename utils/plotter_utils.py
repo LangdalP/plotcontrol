@@ -1,13 +1,16 @@
 import sys
 from pyaxidraw import axidraw
 
-def init_plotter_interactive():
+
+def init_plotter_interactive(spd, spu):
     ad = axidraw.AxiDraw()
     ad.interactive()
     ad_connected = ad.connect()
     if not ad_connected:
         return None
     ad.options.units = 1 # Bruker cm i stedet for inches
+    ad.options.speed_pendown = spd
+    ad.options.speed_penup = spu
     ad.update()
     print(f'Fant trolig plotter...')
     return ad
