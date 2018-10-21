@@ -6,6 +6,8 @@ from svgpathtools.paths2svg import big_bounding_box
 
 
 def align_components(eyes, nose, mouth, height):
+    padding = 0.5
+
     nose_min, nose_max, _, _ = big_bounding_box(nose)
     eyes_min, eyes_max, _, _ = big_bounding_box(eyes)
     _, mouth_max, _, _ = big_bounding_box(mouth)
@@ -15,10 +17,10 @@ def align_components(eyes, nose, mouth, height):
     nose_delta = nose_top - nose_max
 
     eyes_height = eyes_max - eyes_min
-    eyes_top = nose_top + eyes_height
-    eyes_delta = eyes_top - eyes_max
+    eyes_top = nose_top + eyes_height + padding
+    eyes_delta = eyes_top - eyes_max 
 
-    mouth_top = nose_top - nose_height
+    mouth_top = nose_top - nose_height - padding
     mouth_delta = mouth_top - mouth_max
 
     face = []
