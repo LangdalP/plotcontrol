@@ -38,6 +38,8 @@ INSTRUKSJON_DICT = {
     "DRAW_MOUTH_2": "Trykk X for å avslutte",
     "PAUSE_1": "Fri modus",
     "PAUSE_2": "Sett i blankt ark og trykk X for å tegne ansikt",
+    "GENERATIVE_1": "Harry Plotter tegner ansikter basert",
+    "GENERATIVE_2": "på hva andre har tegnet tidligere i dag",
 }
 
 XBOX_A_BTN = 0
@@ -238,8 +240,8 @@ def start_game_loop(surface, joystick, plotter):
 
         if program_state == ProgramState.GENERATIVE:
             gfx.clear(surface)
-            text1 = font_renderer.render("Harry Plotter tegner ansikter basert", False, (0, 0, 0))
-            text2 = font_renderer.render("på hva andre har tegnet tidligere i dag", False, (0, 0, 0))
+            text1 = font_renderer.render(INSTRUKSJON_DICT["GENERATIVE_1"], False, (0, 0, 0))
+            text2 = font_renderer.render(INSTRUKSJON_DICT["GENERATIVE_2"], False, (0, 0, 0))
             gfx.render_text(surface, text1, 500)
             gfx.render_text(surface, text2, 600)
             pygame.display.update()
