@@ -126,8 +126,14 @@ def save_svg():
         relative_line_segments = []
         paths = []
 
+speed_pen_down = 10
+speed_pen_up = 90
+
 def draw_border():
+    global spd
     if plotter:
+        plotter.options.speed_pendown = 90
+        plotter.update()
         plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
         plotter.pendown()
         plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MAX)
@@ -135,6 +141,8 @@ def draw_border():
         plotter.goto(PLOTTER_X_MAX, PLOTTER_Y_MIN)
         plotter.goto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
         plotter.penup()
+        plotter.options.speed_pendown = speed_pen_down
+        plotter.update()
 
 def reset(surface, plotter, should_draw_border=True):
     global fname
@@ -256,18 +264,19 @@ def start_game_loop(surface, joystick, plotter):
 
                 color = RED if pen_is_down else BLUE
                 gfx.draw_line(surface,
-                old_plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
-                old_plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
-                plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
-                plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y,
+                old_plotter_y*DRAW_FACTOR + 500,
+                -1*old_plotter_x*DRAW_FACTOR + 870,
+                plotter_y*DRAW_FACTOR + 500,
+                -1*plotter_x*DRAW_FACTOR + 870,
                 color)
                 print(f'Plotter: {plotter_x}, {plotter_y}')
 
             gfx.draw_border(surface,
                 PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
+                (PLOTTER_Y_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
                 PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
-                (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
-                (PLOTTER_Y_MAX -PLOTTER_X_MIN) * DRAW_FACTOR)
+                (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR)
+
             instruksjon1 = INSTRUKSJON_DICT[program_state.name + "_1"]
             instruksjon2 = INSTRUKSJON_DICT[program_state.name + "_2"]
             text1 = font_renderer.render(instruksjon1, False, (0, 0, 0))
@@ -295,7 +304,7 @@ def main():
     if joystick == None:
         cleanup_and_exit()
 
-    plotter = init_plotter_interactive()
+    plotter = init_plotter_interactive(speed_pen_down, speed_pen_up)
 
 
     try:
