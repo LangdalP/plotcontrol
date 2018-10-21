@@ -11,7 +11,7 @@ def align_components(eyes, nose, mouth, height):
     _, mouth_max, _, _ = big_bounding_box(mouth)
 
     nose_height = nose_max - nose_min
-    nose_top = (height + nose_height) / 2
+    nose_top = ((height + nose_height) / 2) + 3.5
     nose_delta = nose_top - nose_max
 
     eyes_height = eyes_max - eyes_min
@@ -37,19 +37,7 @@ def get_paths_from_directory(dirpath, feature_type):
 
 
 def generate_face():
-def get_svg_attributes():
-    return {
-        'xmlns': u'http://www.w3.org/2000/svg',
-        u'baseProfile': u'full',
-        u'xmlns:ev': u'http://www.w3.org/2001/xml-events',
-        u'width': u'240mm',
-        u'height': u'160mm',
-        u'version': u'1.1',
-        u'xmlns:xlink': u'http://www.w3.org/1999/xlink',
-        u'viewBox': u'3.5 3.5 24 16'}
-
-
-    height = 30
+    height = 24.5
     folder = './input'
 
     eyepaths = get_paths_from_directory(folder + '/eyes/', 'EYES')
@@ -59,7 +47,7 @@ def get_svg_attributes():
     facepaths = align_components(eyepaths, nosepaths, mouthpaths, height)
     filename = 'output/' + uuid.uuid4().hex + '.svg'
 
-    wsvg(facepaths, filename=filename, svg_attributes=get_svg_attributes())
+    wsvg(facepaths, dimensions=('275mm', '195mm'), stroke_widths=[1]*2000, filename=filename, viewbox="0 0 27.5 19.5")
 
     return filename
 
