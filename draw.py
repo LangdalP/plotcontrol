@@ -151,7 +151,8 @@ def start_game_loop(surface, joystick, plotter):
     pygame.display.update()
     plotter_x = PLOTTER_X_MIN
     plotter_y = PLOTTER_Y_MIN
-    plotter.moveto(plotter_x, plotter_y)
+    if plotter:
+        plotter.moveto(plotter_x, plotter_y)
     reset(surface, plotter, False)
 
     pen_is_down = False
@@ -204,7 +205,7 @@ def start_game_loop(surface, joystick, plotter):
                         if program_state != ProgramState.PAUSE:
                             save_lines()
                     save_svg()
-                
+
                 if plotter:
                     # Let plotter do a "nod"
                     plotter.moveto(plotter_x+0.5, plotter_y)
@@ -252,7 +253,7 @@ def start_game_loop(surface, joystick, plotter):
 
                 if plotter:
                     plotter.goto(plotter_x, plotter_y)
-                
+
                 color = RED if pen_is_down else BLUE
                 gfx.draw_line(surface,
                 old_plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X,
