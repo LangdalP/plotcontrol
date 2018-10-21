@@ -224,6 +224,8 @@ def start_game_loop(surface, joystick, plotter):
                     if plotter:
                         plotter.penup()
                         plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
+                        plotter_x = PLOTTER_X_MIN
+                        plotter_y = PLOTTER_Y_MIN
 
                 if program_state == ProgramState.DRAW_EYES:
                     reset(surface, plotter)
