@@ -13,7 +13,6 @@ def init_plotter_interactive():
     return ad
 
 def disconnect_serial(plotter):
-    plotter.moveto(5, 5)
     plotter.disconnect()
 
 def start_svg_plot(plotter, plot_fname):

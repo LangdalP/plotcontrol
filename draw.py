@@ -163,6 +163,7 @@ def start_game_loop(surface, joystick, plotter):
                 program_state = ProgramState.GENERATIVE
                 print("Entered generative mode")
                 if plotter:
+                    plotter.moveto(0, 0)
                     disconnect_serial(plotter)
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN and program_state == ProgramState.GENERATIVE:
                 # TODO: Om eg allereie har plotta før, gå tilbake til (5, 5)
@@ -173,12 +174,6 @@ def start_game_loop(surface, joystick, plotter):
             if event.type == pygame.KEYUP and event.key == pygame.K_i and program_state == ProgramState.GENERATIVE:
                 program_state = ProgramState.PAUSE
                 if plotter:
-                    # TODO: Manuelt gå tilbake til (0, 0)
-                    # plotter.plot_setup("calibrate.svg")
-                    # plotter.options.mode = "manual"
-                    # plotter.options.manual_cmd = "walk_x"
-                    # plotter.options.walk_dist = 0.5 # inches
-                    # plotter.plot_run(True)
                     go_back_to_interactive_mode(plotter)
                     plotter.moveto(PLOTTER_X_MIN, PLOTTER_Y_MIN)
                     plotter_x = PLOTTER_X_MIN
