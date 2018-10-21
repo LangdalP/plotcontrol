@@ -6,8 +6,8 @@
 - [x] Fiks: Det blir lagt til en strek når en skifter mode
 - [x] Fiks at genererte SVG-er blir riktig plottet
 - [x] roter tegningen på skjerm?
-- [ ] Oppdater plotter_x og y når man går fra "tegn munn"-mode til "fri modus"
-- [ ] Fiks et mellomstopp på ca (2, 2) før (0, 0) når man går til generative mode
+- [x] Oppdater plotter_x og y når man går fra "tegn munn"-mode til "fri modus"
+- [x] Fiks et mellomstopp på ca (2, 2) før (0, 0) når man går til generative mode
 
 Hvis vi får tid:
 - [ ] Gjør det mulig å resette/slette SVG dersom man har tegnet alt som øyne (glemte å trykke for nese og munn)
