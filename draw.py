@@ -60,8 +60,8 @@ PLOTTER_Y_MID = (PLOTTER_Y_MAX - PLOTTER_Y_MIN) / 2 + PLOTTER_Y_MIN
 
 # Var 50
 DRAW_FACTOR = 20
-PREVIEW_OFFSET_X = 500
-PREVIEW_OFFSET_Y = 300
+PREVIEW_OFFSET_X = 730
+PREVIEW_OFFSET_Y = 350
 
 # Global state
 plotter_x = PLOTTER_X_MIN
@@ -264,17 +264,17 @@ def start_game_loop(surface, joystick, plotter):
 
                 color = RED if pen_is_down else BLUE
                 gfx.draw_line(surface,
-                old_plotter_y*DRAW_FACTOR + 500,
-                -1*old_plotter_x*DRAW_FACTOR + 870,
-                plotter_y*DRAW_FACTOR + 500,
-                -1*plotter_x*DRAW_FACTOR + 870,
+                old_plotter_y*DRAW_FACTOR + 730,
+                -1*old_plotter_x*DRAW_FACTOR + 970,
+                plotter_y*DRAW_FACTOR + 730,
+                -1*plotter_x*DRAW_FACTOR + 970,
                 color)
                 print(f'Plotter: {plotter_x}, {plotter_y}')
 
             gfx.draw_border(surface,
                 PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
-                (PLOTTER_Y_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
                 PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
+                (PLOTTER_Y_MAX - PLOTTER_X_MIN) * DRAW_FACTOR,
                 (PLOTTER_X_MAX - PLOTTER_X_MIN) * DRAW_FACTOR)
 
             instruksjon1 = INSTRUKSJON_DICT[program_state.name + "_1"]
@@ -293,7 +293,6 @@ def main():
     font_renderer = init_font_rendering()
     window_width, window_height = surface.get_size()
 
-    gfx.draw_pointer(surface, plotter_x*DRAW_FACTOR + PREVIEW_OFFSET_X, plotter_y*DRAW_FACTOR + PREVIEW_OFFSET_Y)
     gfx.draw_border(surface,
     PLOTTER_X_MIN * DRAW_FACTOR + PREVIEW_OFFSET_X,
     PLOTTER_Y_MIN * DRAW_FACTOR + PREVIEW_OFFSET_Y,
