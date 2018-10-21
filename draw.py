@@ -171,6 +171,7 @@ def start_game_loop(surface, joystick, plotter):
                 program_state = ProgramState.GENERATIVE
                 print("Entered generative mode")
                 if plotter:
+                    plotter.moveto(1.5, 1.5)
                     plotter.moveto(0, 0)
                     disconnect_serial(plotter)
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN and program_state == ProgramState.GENERATIVE:
