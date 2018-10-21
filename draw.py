@@ -15,12 +15,6 @@ import time
 import uuid
 from enum import Enum
 
-# TODO
-# - Teste at dette funkar som vi forventar
-# - Kor skal nye paths starte? Kan dei starte p 0, 0?
-# - Finne ut: Skal folk kunne tegne ansikt p avgrensa kvadrantar p eit ark
-# - Finne ut: M dei som styrer standen bytte til eit clean ark nr plotteren skal i tegn-sjlv-modus?
-
 class ProgramState(Enum):
     DRAW_EYES = 1
     DRAW_NOSE = 2
