@@ -166,9 +166,7 @@ def start_game_loop(surface, joystick, plotter):
                     plotter.moveto(0, 0)
                     disconnect_serial(plotter)
             if event.type == pygame.KEYUP and event.key == pygame.K_RETURN and program_state == ProgramState.GENERATIVE:
-                # TODO: Om eg allereie har plotta før, gå tilbake til (5, 5)
-                # generated_svg_path = generate_face()
-                generated_svg_path = "calibrate.svg"
+                generated_svg_path = generate_face()
                 if plotter:
                     start_svg_plot(plotter, generated_svg_path)
             if event.type == pygame.KEYUP and event.key == pygame.K_i and program_state == ProgramState.GENERATIVE:
@@ -228,7 +226,7 @@ def start_game_loop(surface, joystick, plotter):
                         plotter.goto(plotter_x, plotter_y)
 
                     pygame.display.update()
-            if event.type == pygame.JOYBUTTONDOWN and event.button == XBOX_BACK_BTN:
+            if event.type == pygame.JOYBUTTONDOWN and event.button == XBOX_BACK_BTN and program_state != ProgramState.GENERATIVE:
                 quit()
             if event.type == QUIT:
                 quit()
