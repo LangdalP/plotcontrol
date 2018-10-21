@@ -12,8 +12,7 @@
 
 Hvis vi får tid:
 - [ ] Gjør det mulig å resette/slette SVG dersom man har tegnet alt som øyne (glemte å trykke for nese og munn)
-- [ ] øk speed ved tegning av ramme
-- [ ] øk speed ved pen up? for å gjevne ut feelingen
+- [ x ] øk speed ved tegning av ramme
+- [ x ] øk speed ved pen up? for å gjevne ut feelingen
 
 - [ ] tegn prikker fremfor linjer med pen up?
-
