@@ -35,8 +35,6 @@ def get_paths_from_directory(dirpath, feature_type):
     paths, _ = svg2paths(dirpath + chosen_svg)
     return paths
 
-
-def generate_face():
 def get_svg_attributes():
     return {
         'xmlns': u'http://www.w3.org/2000/svg',
@@ -48,7 +46,7 @@ def get_svg_attributes():
         u'xmlns:xlink': u'http://www.w3.org/1999/xlink',
         u'viewBox': u'3.5 3.5 24 16'}
 
-
+def generate_face():
     height = 30
     folder = './input'
 
